@@ -153,9 +153,20 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+#ifdef __GNUC__
+int __io_putchar(int ch)
+#else
+int fputc(int ch, FILE *f)
+#endif /* __GNUC__ */
+{
+  HAL_UART_Transmit(&huart2, (uint8_t *)&ch, 2, HAL_MAX_DELAY);
+
+  return ch;
+}
+
 static void jump_app(void) {
-  printf("jumping to app!");
-  (void *) (*app_reset_handler) = (void *) (*(volatile uint32_t*) (0x08010000 + 4));
+  printf("jumping to app! \n");
+  void (*app_reset_handler) (void) = (void *) (*(volatile uint32_t*) (0x08010000 + 4));
 
   app_reset_handler();
 }
