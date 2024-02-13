@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include <stdio.h>
 #include "usart.h"
 #include "gpio.h"
 
@@ -33,7 +34,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define MAJOR 0
+#define MINOR 1
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -44,7 +46,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+const uint8_t app_version[2] = {MAJOR, MINOR};
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -88,7 +90,7 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-
+  printf("APP Starting! Version number: %d.%d\n", app_version[0], app_version[1]);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -154,6 +156,16 @@ void SystemClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 
+#ifdef __GNUC__
+int __io_putchar(int ch)
+#else
+int fputc(int ch, FILE *f)
+#endif /* __GNUC__ */
+{
+  HAL_UART_Transmit(&huart2, (uint8_t *)&ch, 2, HAL_MAX_DELAY);
+
+  return ch;
+}
 /* USER CODE END 4 */
 
 /**
