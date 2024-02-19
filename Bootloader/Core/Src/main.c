@@ -92,6 +92,36 @@ int main(void)
   printf("Bootloader Starting! Version number: %d.%d\n", bl_version[0], bl_version[1]);
   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, SET);  
 
+  bool ota_btn_state = 0;
+  uint32_t end_tick = HAL_GetTick() + 2000;
+  do {
+	ota_btn_state = HAL_GPIO_ReadPin( GPIOC, GPIO_PIN_13 );
+	uint32_t current_tick = HAL_GetTick();
+
+	if( ( ota_btn_state != GPIO_PIN_RESET ) || ( current_tick > end_tick ) )
+	{
+	  break;
+	}
+  }
+  while(true);
+
+  if(ota_btn_state)
+  {
+	  printf("Starting firmware download\n");
+
+	  if(etx_ota_download_and_flash() != ETX_OTA_EX_OK)
+	  {
+		  printf("OTA update error. Program halting\n");
+		  while(true);
+	  }
+	  else
+	  {
+		  printf("OTA update done! Rebooting\n");
+		  HAL_NVIC_SystemReset(); //Reset application to load it
+	  }
+
+  }
+
   jump_app();
   /* USER CODE END 2 */
 
